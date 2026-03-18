@@ -1,0 +1,19 @@
+# Local state files
+terraform.tfstate
+terraform.tfstate.backup
+
+# Local terraform directory
+.terraform/
+
+# Variables file (may contain sensitive values)
+*.tfvars
+*.tfvars.json
+
+# Crash log files
+crash.log
+
+# Override files
+override.tf
+override.tf.json
+
+.vscode/
