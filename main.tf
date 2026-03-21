@@ -45,9 +45,9 @@ resource "aws_subnet" "main_subnet" {
 
 resource "aws_instance" "app_server" {
   ami           = data.aws_ami.ubuntu.id
-  instance_type = "t2.micro"
+  instance_type = var.instance_type
   subnet_id     = aws_subnet.main_subnet.id
   tags = {
-    Name = "terraform-on-aws"
+    Name = var.instance_name
   }
 }
