@@ -28,25 +28,31 @@ data "aws_ami" "ubuntu" {
   owners = ["099720109477"]
 }
 
-resource "aws_vpc" "main_vpc" {
-  cidr_block = "10.0.0.0/16"
-  tags = {
-    Name = "terraform-on-aws-vpc"
-  }
-}
+module "vpc" {
+  source = "terraform-aws-modules/vpc/aws"
 
-resource "aws_subnet" "main_subnet" {
-  vpc_id     = aws_vpc.main_vpc.id
-  cidr_block = "10.0.1.0/24"
+  name = "my-vpc"
+  cidr = "10.0.0.0/16"
+
+  azs             = ["eu-west-2a", "eu-west-2b", "eu-west-2c"]
+  private_subnets = ["10.0.1.0/24", "10.0.2.0/24", "10.0.3.0/24"]
+  public_subnets  = ["10.0.101.0/24", "10.0.102.0/24", "10.0.103.0/24"]
+
+ enable_dns_hostnames = true
+ enable_nat_gateway   = false    
+ enable_vpn_gateway   = false 
+
   tags = {
-    Name = "terraform-on-aws-subnet"
+    Terraform = "true"
+    Environment = "dev"
   }
 }
 
 resource "aws_instance" "app_server" {
   ami           = data.aws_ami.ubuntu.id
   instance_type = var.instance_type
-  subnet_id     = aws_subnet.main_subnet.id
+  vpc_security_group_ids = [module.vpc.default_security_group_id]
+  subnet_id = module.vpc.private_subnets[0]
   tags = {
     Name = var.instance_name
   }
